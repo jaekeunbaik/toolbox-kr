@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>글자수 세기 - 공백 포함/제외 | toolbox-kr</title>
+<meta name="description" content="자기소개서, 리포트 글자수를 공백 포함·제외, 바이트까지 바로 세어 드립니다.">
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+  textarea { width: 100%; min-height: 12rem; font-size: 1rem; padding: .5rem; box-sizing: border-box; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: .25rem 1rem; }
+  dd { margin: 0; font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>글자수 세기</h1>
+<label for="t">글을 붙여넣으세요</label>
+<textarea id="t"></textarea>
+<dl aria-live="polite">
+  <dt>공백 포함</dt><dd id="all">0</dd>
+  <dt>공백 제외</dt><dd id="nospace">0</dd>
+  <dt>바이트 (UTF-8)</dt><dd id="bytes">0</dd>
+</dl>
+<script>
+  const t = document.getElementById('t');
+  const count = s => ({
+    all: [...s].length,                      // [...s] counts emoji as 1, not 2
+    nospace: [...s.replace(/\s/g, '')].length,
+    bytes: new TextEncoder().encode(s).length,
+  });
+  t.addEventListener('input', () => {
+    const c = count(t.value);
+    for (const k in c) document.getElementById(k).textContent = c[k].toLocaleString();
+  });
+  console.assert(JSON.stringify(count('가 a😀')) === '{"all":4,"nospace":3,"bytes":9}', 'count self-check');
+</script>
+</body>
+</html>
