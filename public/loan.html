@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대출 이자 계산기 - 원리금균등·원금균등·만기일시 | toolbox-kr</title>
+<meta name="description" content="대출금, 금리, 기간을 넣으면 월 상환액과 총 이자를 원리금균등·원금균등·만기일시 방식별로 계산합니다.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<h1>대출 이자 계산기</h1>
+<form id="f">
+  <label>대출금 (원) <input type="number" name="p" value="100000000" min="1" step="any" required></label>
+  <label>연 금리 (%) <input type="number" name="r" value="4.5" min="0" step="any" required></label>
+  <label>기간 (개월) <input type="number" name="n" value="360" min="1" step="1" required></label>
+  <label>상환 방식
+    <select name="type">
+      <option value="equal-payment">원리금균등 (매달 같은 금액)</option>
+      <option value="equal-principal">원금균등 (갈수록 줄어듦)</option>
+      <option value="bullet">만기일시 (이자만 내다가 마지막에 원금)</option>
+    </select>
+  </label>
+</form>
+<dl aria-live="polite">
+  <dt id="mlabel">월 상환액</dt><dd id="monthly">-</dd>
+  <dt>총 이자</dt><dd id="interest">-</dd>
+  <dt>총 상환액</dt><dd id="total">-</dd>
+</dl>
+<p class="help">원금균등은 첫 달 상환액이 가장 크고 매달 줄어듭니다. 만기일시는 마지막 달에 원금을 한 번에 갚습니다. 실제 대출은 중도상환수수료·우대금리 등에 따라 달라질 수 있습니다.</p>
+<script type="module">
+  import { loan, won } from '/js/calc.js';
+  const f = document.getElementById('f');
+  const show = () => {
+    const p = +f.p.value, r = +f.r.value, n = +f.n.value;
+    if (!(p > 0 && r >= 0 && n >= 1)) return;
+    const x = loan(p, r, n, f.type.value);
+    document.getElementById('mlabel').textContent = f.type.value === 'equal-principal' ? '첫 달 상환액' : '월 상환액';
+    document.getElementById('monthly').textContent = won(x.monthly);
+    document.getElementById('interest').textContent = won(x.totalInterest);
+    document.getElementById('total').textContent = won(p + x.totalInterest);
+  };
+  f.addEventListener('input', show);
+  show();
+</script>
+</body>
+</html>
