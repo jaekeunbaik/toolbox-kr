@@ -38,3 +38,9 @@ assert.equal(calls.length, 0, 'honeypot must not create issue');
 assert.equal((await contact({ message: '대출 계산기 추가해주세요' })).status, 200);
 assert.equal(calls.pop()[2].title, '[문의] 대출 계산기 추가해주세요');
 console.log('all worker tests passed');
+
+// unknown GET -> friendly 404 page from assets, with a real 404 status
+const r404 = await worker.fetch(new Request('https://x/nope'), { ...env, ASSETS: { fetch: async u => new Response(`page for ${new URL(u).pathname}`) } });
+assert.equal(r404.status, 404);
+assert.equal(await r404.text(), 'page for /404');
+console.log('404 test passed');

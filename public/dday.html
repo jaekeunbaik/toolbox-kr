@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>D-day 계산기: 날짜 차이, 며칠째 | toolbox-kr</title>
 <meta name="description" content="목표일까지 D-day, 두 날짜 사이 일수, 사귄 지 며칠째인지 계산합니다.">
+<link rel="canonical" href="https://toolbox-kr.ethan-kr.workers.dev/dday">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="toolbox-kr">
+<meta property="og:title" content="D-day 계산기: 날짜 차이, 며칠째 | toolbox-kr">
+<meta property="og:description" content="목표일까지 D-day, 두 날짜 사이 일수, 사귄 지 며칠째인지 계산합니다.">
+<meta property="og:url" content="https://toolbox-kr.ethan-kr.workers.dev/dday">
+<meta name="theme-color" content="#EEF1EC">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
@@ -27,6 +36,12 @@
     <dt>시작일을 1일로 세면</dt><dd id="nth">-</dd>
   </dl>
 </section>
+<h2>며칠 후는 언제?</h2>
+<p class="sentence">
+  시작일부터 <input type="number" id="plus" value="100" step="1" inputmode="numeric" aria-label="더할 날 수">일 후는
+  <output id="later" aria-live="polite"><mark>-</mark></output>
+</p>
+<p class="read" id="nthday"></p>
 <section class="notes">
   <h2>알아두면 좋은 점</h2>
   <ul>
@@ -35,7 +50,7 @@
   </ul>
 </section>
 <script type="module">
-  import { daysBetween, parseDate, todayParts } from '/js/calc.js';
+  import { daysBetween, parseDate, todayParts, addDays, weekday } from '/js/calc.js';
   const $ = id => document.getElementById(id);
   const t = todayParts(), iso = p => `${p.y}-${String(p.m).padStart(2, '0')}-${String(p.d).padStart(2, '0')}`;
   $('from').value = iso(t);
@@ -46,10 +61,18 @@
     $('dday').textContent = n === 0 ? 'D-Day' : n > 0 ? `D-${n.toLocaleString()}` : `D+${(-n).toLocaleString()}`;
     $('diff').textContent = `${Math.abs(n).toLocaleString()}일`;
     $('nth').textContent = `${(Math.abs(n) + 1).toLocaleString()}일째`;
+    const k = Math.trunc(+$('plus').value);
+    // 100일 기념일 counts the start day as day 1, so "100일째" = start + 99
+    const at = addDays(parseDate($('from').value), k), nth = addDays(parseDate($('from').value), k - 1);
+    $('later').firstElementChild.textContent = Number.isFinite(k)
+      ? `${at.y}년 ${at.m}월 ${at.d}일 (${weekday(at)})` : '-';
+    $('nthday').textContent = Number.isFinite(k) ? `시작일을 1일째로 세는 기념일이라면 ${k}일째는 ${nth.y}년 ${nth.m}월 ${nth.d}일 (${weekday(nth)})이에요.` : '';
   };
   document.addEventListener('input', show);
   show();
 </script>
+<script type="module" src="/js/share.js"></script>
+<nav class="related" aria-label="관련 계산기"><h2>함께 쓰는 계산기</h2><ul><li><a href="/age">만 나이</a></li><li><a href="/severance">퇴직금</a></li><li><a href="/wage">시급·주휴수당</a></li></ul></nav>
 </main>
 <footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>

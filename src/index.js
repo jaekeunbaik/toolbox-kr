@@ -66,6 +66,10 @@ export default {
     const { pathname } = new URL(req.url);
     if (req.method === 'POST' && pathname === '/api/contact') return contact(req, env);
     if (req.method === 'POST' && pathname === '/discord') return discord(req, env);
+    if (req.method === 'GET' && env.ASSETS) { // friendly page for unknown addresses, still a real 404 for search engines
+      const page = await env.ASSETS.fetch(new URL('/404', req.url));
+      return new Response(page.body, { status: 404, headers: page.headers });
+    }
     return new Response('Not found', { status: 404 });
   },
 };

@@ -5,6 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>대출 이자 계산기: 원리금균등·원금균등·만기일시 | toolbox-kr</title>
 <meta name="description" content="대출금, 금리, 기간을 넣으면 월 상환액과 총 이자를 원리금균등·원금균등·만기일시 방식별로 계산합니다.">
+<link rel="canonical" href="https://toolbox-kr.ethan-kr.workers.dev/loan">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="toolbox-kr">
+<meta property="og:title" content="대출 이자 계산기: 원리금균등·원금균등·만기일시 | toolbox-kr">
+<meta property="og:description" content="대출금, 금리, 기간을 넣으면 월 상환액과 총 이자를 원리금균등·원금균등·만기일시 방식별로 계산합니다.">
+<meta property="og:url" content="https://toolbox-kr.ethan-kr.workers.dev/loan">
+<meta name="theme-color" content="#EEF1EC">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
@@ -35,6 +44,13 @@
     <dt>총 이자</dt><dd id="interest">-</dd>
     <dt>총 상환액</dt><dd id="total">-</dd>
   </dl>
+  <details class="schedule">
+    <summary>월별 상환 스케줄 보기</summary>
+    <div class="table-wrap"><table>
+      <thead><tr><th scope="col">회차</th><th scope="col">상환액</th><th scope="col">원금</th><th scope="col">이자</th><th scope="col">남은 원금</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+  </details>
 </section>
 <section class="notes">
   <h2>상환 방식 차이</h2>
@@ -45,7 +61,16 @@
   </ul>
 </section>
 <script type="module">
-  import { loan, won } from '/js/calc.js';
+  import { loan, loanSchedule, won } from '/js/calc.js';
+  const n0 = x => Math.round(x).toLocaleString('ko-KR');
+  const schedule = document.querySelector('.schedule');
+  const fillRows = () => {
+    if (!schedule.open) return; // building 360 rows only when someone opens the table
+    const f = document.getElementById('f');
+    document.getElementById('rows').innerHTML = loanSchedule(+f.p.value, +f.r.value, +f.n.value, f.type.value)
+      .map(r => `<tr><td>${r.n}</td><td>${n0(r.payment)}</td><td>${n0(r.principal)}</td><td>${n0(r.interest)}</td><td>${n0(r.balance)}</td></tr>`).join('');
+  };
+  schedule.addEventListener('toggle', fillRows);
   const f = document.getElementById('f');
   const show = () => {
     const p = +f.p.value, r = +f.r.value, n = +f.n.value, type = f.type.value;
@@ -55,11 +80,14 @@
     document.getElementById('monthly').textContent = won(x.monthly);
     document.getElementById('interest').textContent = won(x.totalInterest);
     document.getElementById('total').textContent = won(p + x.totalInterest);
+    fillRows();
   };
   f.addEventListener('input', show);
   show();
 </script>
 <script type="module" src="/js/won-hint.js"></script>
+<script type="module" src="/js/share.js"></script>
+<nav class="related" aria-label="관련 계산기"><h2>함께 쓰는 계산기</h2><ul><li><a href="/savings">예금·적금 이자</a></li><li><a href="/percent">퍼센트</a></li><li><a href="/severance">퇴직금</a></li></ul></nav>
 </main>
 <footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>

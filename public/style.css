@@ -118,3 +118,26 @@ mark {
   .answer-value mark { animation: draw .45s .15s ease-out both; }
   @keyframes draw { from { background-size: 0 52%; } }
 }
+
+/* share link under the answer */
+.share { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1rem; margin: 1rem 0 0; font-size: .9rem; color: var(--muted); }
+button.quiet { padding: .35rem .8rem; border: 1px solid var(--ink); border-radius: 4px; background: transparent; cursor: pointer; font-size: .9rem; }
+button.quiet:hover { background: var(--field); }
+
+/* month-by-month loan table */
+.schedule { margin-top: 1.25rem; }
+.schedule summary { cursor: pointer; font-weight: 500; padding: .35rem 0; }
+.table-wrap { max-height: 28rem; overflow: auto; margin-top: .5rem; border-top: 1px solid var(--ink); }
+.schedule table { width: 100%; border-collapse: collapse; font-size: .85rem; font-variant-numeric: tabular-nums; }
+.schedule th, .schedule td { padding: .4rem .5rem; text-align: right; border-bottom: 1px dashed var(--grid); white-space: nowrap; }
+.schedule th { position: sticky; top: 0; background: var(--paper); font-weight: 500; color: var(--muted); }
+.schedule th:first-child, .schedule td:first-child { text-align: left; }
+
+/* related tools at the bottom of each calculator */
+.related { margin-top: 3rem; }
+.related h2 { font-size: 1rem; color: var(--muted); font-weight: 500; }
+.related ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.related a { display: inline-block; padding: .4rem .9rem; border: 1px solid var(--grid); border-radius: 999px; text-decoration: none; font-size: .95rem; }
+.related a:hover { border-color: var(--ink); }
+.related-list { columns: 2; padding-left: 1.1rem; }
+@media (max-width: 30rem) { .schedule table { font-size: .74rem; } .schedule th, .schedule td { padding: .35rem .2rem; } }
