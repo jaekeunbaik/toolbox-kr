@@ -21,6 +21,7 @@
   <dt>공백 포함</dt><dd id="all">0</dd>
   <dt>공백 제외</dt><dd id="nospace">0</dd>
   <dt>바이트 (UTF-8)</dt><dd id="bytes">0</dd>
+  <dt>줄 수</dt><dd id="lines">0</dd>
 </dl>
 <script>
   const t = document.getElementById('t');
@@ -28,12 +29,13 @@
     all: [...s].length,                      // [...s] counts emoji as 1, not 2
     nospace: [...s.replace(/\s/g, '')].length,
     bytes: new TextEncoder().encode(s).length,
+    lines: s === '' ? 0 : s.split(/\r\n|\r|\n/).length,
   });
   t.addEventListener('input', () => {
     const c = count(t.value);
     for (const k in c) document.getElementById(k).textContent = c[k].toLocaleString();
   });
-  console.assert(JSON.stringify(count('가 a😀')) === '{"all":4,"nospace":3,"bytes":9}', 'count self-check');
+  console.assert(JSON.stringify(count('가 a😀')) === '{"all":4,"nospace":3,"bytes":9,"lines":1}', 'count self-check');
 </script>
 </body>
 </html>
