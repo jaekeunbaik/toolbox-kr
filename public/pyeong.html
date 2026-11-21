@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>평수 계산기 - 평 ↔ ㎡ 변환 | toolbox-kr</title>
+<meta name="description" content="평을 제곱미터(㎡)로, ㎡를 평으로 바로 바꿔 드립니다. 아파트 59㎡, 84㎡가 몇 평인지 확인하세요.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<h1>평수 계산기</h1>
+<label>평 <input type="number" id="py" step="any" min="0" value="25"></label>
+<label>제곱미터 (㎡) <input type="number" id="m2" step="any" min="0"></label>
+<h2>자주 찾는 크기</h2>
+<ul id="common"></ul>
+<p class="help">1평 = 400/121 ㎡ ≈ 3.3058㎡. 아파트 분양 면적의 "84㎡"는 보통 전용면적이며, 공급면적(평형)은 이보다 큽니다.</p>
+<script type="module">
+  import { pyeongToM2, m2ToPyeong, num } from '/js/calc.js';
+  const py = document.getElementById('py'), m2 = document.getElementById('m2');
+  py.addEventListener('input', () => { m2.value = py.value === '' ? '' : num(pyeongToM2(+py.value)).replace(/,/g, ''); });
+  m2.addEventListener('input', () => { py.value = m2.value === '' ? '' : num(m2ToPyeong(+m2.value)).replace(/,/g, ''); });
+  py.dispatchEvent(new Event('input'));
+  document.getElementById('common').innerHTML = [39, 49, 59, 74, 84, 101, 114]
+    .map(m => `<li>${m}㎡ ≈ ${num(m2ToPyeong(m), 1)}평</li>`).join('');
+</script>
+</body>
+</html>

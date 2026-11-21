@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>퍼센트 계산기 - 비율, 증감률 | toolbox-kr</title>
+<meta name="description" content="A의 B%, A는 B의 몇 %, 증가율·감소율을 바로 계산합니다.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<h1>퍼센트 계산기</h1>
+
+<h2>A의 B%는?</h2>
+<p><input type="number" step="any" id="a1" value="200" aria-label="A"> 의
+   <input type="number" step="any" id="b1" value="15" aria-label="B 퍼센트">% = <strong id="o1"></strong></p>
+
+<h2>A는 B의 몇 %?</h2>
+<p><input type="number" step="any" id="a2" value="30" aria-label="A"> 는
+   <input type="number" step="any" id="b2" value="200" aria-label="B"> 의 <strong id="o2"></strong></p>
+
+<h2>A에서 B로 바뀌면 몇 % 증감?</h2>
+<p><input type="number" step="any" id="a3" value="100" aria-label="이전 값"> →
+   <input type="number" step="any" id="b3" value="120" aria-label="이후 값"> : <strong id="o3"></strong></p>
+
+<script type="module">
+  import { percentOf, ratio, change, num } from '/js/calc.js';
+  const v = id => +document.getElementById(id).value;
+  const out = (id, x, suffix = '') => document.getElementById(id).textContent = Number.isFinite(x) ? num(x, 4) + suffix : '-';
+  const show = () => {
+    out('o1', percentOf(v('a1'), v('b1')));
+    out('o2', ratio(v('a2'), v('b2')), '%');
+    const c = change(v('a3'), v('b3'));
+    out('o3', Math.abs(c), c > 0 ? '% 증가' : c < 0 ? '% 감소' : '%');
+  };
+  document.addEventListener('input', show);
+  show();
+</script>
+</body>
+</html>
