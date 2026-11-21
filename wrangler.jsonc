@@ -1,6 +1,8 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "toolbox-kr",
+  "main": "src/index.js",
+  "vars": { "REPO": "jaekeunbaik/toolbox-kr" },
   "compatibility_date": "2026-11-19",
   "observability": { "enabled": true },
   // only public/ is served, so worker code and config never become public files

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>관리자에게 문의하기 | toolbox-kr</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 720px; margin: 2rem auto; padding: 0 1rem; line-height: 1.6; }
+  textarea { width: 100%; min-height: 10rem; font-size: 1rem; padding: .5rem; box-sizing: border-box; }
+  .hp { position: absolute; left: -9999px; }
+</style>
+</head>
+<body>
+<p><a href="/">← 도구 목록</a></p>
+<h1>관리자에게 문의하기</h1>
+<p>원하는 계산기, 고쳐야 할 점을 남겨주세요. 답변은 드리지 않지만 검토 후 사이트에 반영됩니다.</p>
+<form id="f">
+  <label for="m">문의 내용</label>
+  <textarea id="m" name="message" required minlength="5" maxlength="2000"></textarea>
+  <input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+  <button type="submit">보내기</button>
+  <p id="s" role="status"></p>
+</form>
+<script>
+  const f = document.getElementById('f'), s = document.getElementById('s');
+  f.addEventListener('submit', async e => {
+    e.preventDefault();
+    f.querySelector('button').disabled = true;
+    s.textContent = '보내는 중...';
+    try {
+      const r = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(Object.fromEntries(new FormData(f))),
+      });
+      const d = await r.json();
+      s.textContent = d.ok ? '접수되었습니다. 감사합니다!' : d.error;
+      if (d.ok) f.reset();
+    } catch { s.textContent = '네트워크 오류입니다. 다시 시도해주세요.'; }
+    f.querySelector('button').disabled = false;
+  });
+</script>
+</body>
+</html>
