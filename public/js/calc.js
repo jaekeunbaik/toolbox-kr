@@ -102,3 +102,27 @@ export function koreanWon(n) {
   if (n % 1e4) parts.push((n % 1e4).toLocaleString('ko-KR'));
   return parts.join(' ') + ' 원';
 }
+
+// Month-by-month repayment rows: { n, payment, principal, interest, balance }.
+export function loanSchedule(principal, ratePct, months, type) {
+  const r = ratePct / 100 / 12, rows = [];
+  const fixed = loan(principal, ratePct, months).monthly;
+  let balance = principal;
+  for (let n = 1; n <= months; n++) {
+    const interest = balance * r;
+    const paid = n === months ? balance // last month clears whatever is left (also absorbs float drift)
+      : type === 'equal-principal' ? principal / months
+      : type === 'bullet' ? 0
+      : fixed - interest;
+    balance -= paid;
+    rows.push({ n, payment: paid + interest, principal: paid, interest, balance: Math.max(balance, 0) });
+  }
+  return rows;
+}
+
+// {y,m,d} + days -> {y,m,d}
+export function addDays(p, days) {
+  const t = new Date(Date.UTC(p.y, p.m - 1, p.d + days));
+  return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
+}
+export const weekday = p => '일월화수목금토'[new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay()];

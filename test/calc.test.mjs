@@ -73,3 +73,16 @@ assert.equal(c.koreanWon(10320), '1만 320 원');
 assert.equal(c.koreanWon(3000000000000), '3조 원');
 assert.equal(c.koreanWon(0), '0원');
 console.log('koreanWon tests passed');
+
+for (const type of ['equal-payment', 'equal-principal', 'bullet']) {
+  const rows = c.loanSchedule(1e8, 5, 12, type);
+  near(rows.reduce((s, r) => s + r.principal, 0), 1e8, 1e-3);
+  near(rows.reduce((s, r) => s + r.interest, 0), c.loan(1e8, 5, 12, type).totalInterest, 1);
+  assert.equal(rows.at(-1).balance, 0);
+}
+near(c.loanSchedule(1e8, 5, 12)[0].payment, 8560748);
+assert.deepEqual(c.addDays(d('2026-11-21'), 100), d('2027-03-01'));
+assert.deepEqual(c.addDays(d('2024-02-28'), 1), d('2024-02-29'));
+assert.deepEqual(c.addDays(d('2026-01-01'), -1), d('2025-12-31'));
+assert.equal(c.weekday(d('2026-11-21')), '토');
+console.log('schedule/date tests passed');
