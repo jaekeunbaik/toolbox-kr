@@ -30,3 +30,46 @@ assert.equal(c.daysBetween(d('2026-11-21'), d('2026-11-20')), -1);
 near(c.pyeongToM2(1), 3.305785, 1e-6);
 near(c.m2ToPyeong(84), 25.41, 0.01); // 국민평형 84㎡ ≈ 25.4평
 console.log('all calc tests passed');
+
+// 주휴수당: 40h at 2026 minimum wage -> 8h rest pay, ~209h/month
+let w = c.weeklyPay(10320, 40);
+assert.equal(w.restHours, 8); assert.equal(w.monthlyHours, 209); assert.equal(w.monthly, 2156880); // 2026 official monthly min wage
+assert.equal(c.weeklyPay(10320, 20).monthlyHours, 104);
+assert.equal(c.weeklyPay(10320, 14).restHours, 0);
+assert.equal(c.weeklyPay(10320, 20).restHours, 4);
+assert.equal(c.weeklyPay(10320, 50).restHours, 8);
+
+// 퇴직금: 2024-01-01 입사, 2026-01-01 퇴직(마지막 근무 2025-12-31), 3개월 900만원
+let s = c.severance({ join: d('2024-01-01'), leave: d('2026-01-01'), pay3m: 9e6 });
+assert.equal(s.workDays, 731); assert.equal(s.days3m, 92); // 2025-10-01 ~ 2025-12-31
+near(s.amount, (9e6 / 92) * 30 * 731 / 365);
+assert.equal(c.severance({ join: d('2025-06-01'), leave: d('2026-03-01'), pay3m: 9e6 }).eligible, false);
+assert.equal(c.severance({ join: d('2024-01-01'), leave: d('2026-03-15'), pay3m: 9e6 }).days3m, 90); // 12-15 ~ 03-14
+
+assert.deepEqual(c.vatFromSupply(10000), { supply: 10000, vat: 1000, total: 11000 });
+assert.deepEqual(c.vatFromTotal(11000), { supply: 10000, vat: 1000, total: 11000 });
+assert.equal(c.vatFromTotal(10000).supply + c.vatFromTotal(10000).vat, 10000);
+
+// 예금 1000만원 연 3% 12개월 단리: 이자 30만, 세금 46,200
+let v = c.savings({ kind: 'deposit', amount: 1e7, ratePct: 3, months: 12 });
+near(v.interest, 3e5); assert.equal(v.tax, 46200); near(v.net, 1e7 + 3e5 - 46200);
+// 적금 월 100만 연 3% 12개월: 이자 = 100만 * 0.0025 * 78 = 195,000
+near(c.savings({ kind: 'installment', amount: 1e6, ratePct: 3, months: 12 }).interest, 195000);
+assert.equal(c.savings({ kind: 'installment', amount: 1e6, ratePct: 3, months: 12, taxPct: 0 }).tax, 0);
+near(c.savings({ kind: 'deposit', amount: 1e7, ratePct: 3, months: 12, compound: true }).interest, 304159.569, 0.01);
+
+assert.equal(c.discounted(50000, 20), 40000);
+near(c.discountRate(50000, 40000), 20, 1e-9);
+
+near(c.convert('length', 1, 'in', 'cm'), 2.54, 1e-9);
+near(c.convert('length', 1, '자', 'cm'), 30.303, 0.001);
+near(c.convert('weight', 1, '근', 'kg'), 0.6, 1e-9);
+near(c.convert('weight', 1, 'lb', 'kg'), 0.45359237, 1e-12);
+assert.equal(c.cToF(100), 212); assert.equal(c.fToC(32), 0);
+console.log('new calc tests passed');
+assert.equal(c.koreanWon(100000000), '1억 원');
+assert.equal(c.koreanWon(123456789), '1억 2,345만 6,789 원');
+assert.equal(c.koreanWon(10320), '1만 320 원');
+assert.equal(c.koreanWon(3000000000000), '3조 원');
+assert.equal(c.koreanWon(0), '0원');
+console.log('koreanWon tests passed');

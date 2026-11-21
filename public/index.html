@@ -3,22 +3,64 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>toolbox-kr - 생활 계산기 모음</title>
-<meta name="description" content="글자수 세기, 대출 이자, 퍼센트, 만 나이, D-day, 평수 계산기를 무료로, 가입 없이 바로 쓰세요.">
+<title>toolbox-kr: 생활 계산기 모음</title>
+<meta name="description" content="대출 이자, 예적금, 주휴수당, 퇴직금, 부가세, 만 나이, D-day, 평수, BMI 계산기를 가입 없이 바로 쓰세요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<nav><span>toolbox-kr</span><a href="/contact">문의하기</a></nav>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
 <h1>생활 계산기 모음</h1>
-<ul class="tools">
-  <li><a href="/char-count">글자수 세기<small>공백 포함·제외, 바이트, 줄 수</small></a></li>
-  <li><a href="/loan">대출 이자 계산기<small>원리금균등·원금균등·만기일시 월 상환액</small></a></li>
-  <li><a href="/percent">퍼센트 계산기<small>A의 B%, 비율, 증감률</small></a></li>
-  <li><a href="/age">만 나이 계산기<small>만 나이, 연 나이, 다음 생일</small></a></li>
-  <li><a href="/dday">D-day 계산기<small>남은 날, 날짜 차이, 며칠째</small></a></li>
-  <li><a href="/pyeong">평수 계산기<small>평 ↔ ㎡ 변환</small></a></li>
-  <li><a href="/bmi">BMI 계산기<small>비만도, 저체중·정상·과체중·비만 구분</small></a></li>
-</ul>
-<p class="help">필요한 계산기가 없나요? <a href="/contact">문의하기</a>로 남겨주시면 검토 후 추가됩니다.</p>
+<p class="lede">돈, 날짜, 생활 단위까지. 가입 없이 바로 계산하세요.</p>
+<label class="field search">찾는 계산기
+  <input type="search" id="q" placeholder="예: 이자, 나이, 평수" autocomplete="off">
+</label>
+<div class="toc" id="toc">
+  <h2>돈 계산</h2>
+  <ul>
+    <li><a href="/loan" data-k="대출 이자 주담대 원리금 원금균등 만기일시 상환"><strong>대출 이자</strong><small>원리금균등·원금균등·만기일시 월 상환액</small><span class="eg">1억, 4.5%, 30년이면 월 506,685원</span></a></li>
+    <li><a href="/savings" data-k="예금 적금 이자 세후 이자과세 비과세"><strong>예금·적금 이자</strong><small>세후 수령액, 이자과세 15.4%·비과세</small><span class="eg">월 50만 원, 3.5%, 1년이면 세후 이자 96,240원</span></a></li>
+    <li><a href="/wage" data-k="시급 주휴수당 월급 알바 최저임금"><strong>시급·주휴수당</strong><small>주휴수당 포함 주급·월급 환산</small><span class="eg">시급 10,320원, 주 40시간이면 월 2,156,880원</span></a></li>
+    <li><a href="/severance" data-k="퇴직금 평균임금 퇴사"><strong>퇴직금</strong><small>평균임금으로 예상 퇴직금</small><span class="eg">3년, 월 300만 원이면 약 881만 원</span></a></li>
+    <li><a href="/vat" data-k="부가세 부가가치세 공급가액 VAT 세금계산서"><strong>부가세</strong><small>공급가액 ↔ 합계금액</small><span class="eg">합계 11,000원 = 공급가 10,000원 + 부가세 1,000원</span></a></li>
+    <li><a href="/discount" data-k="할인 할인율 세일 쇼핑 퍼센트"><strong>할인율</strong><small>할인가, 몇 % 할인인지</small><span class="eg">5만 원에서 20% 할인이면 4만 원</span></a></li>
+  </ul>
+  <h2>날짜</h2>
+  <ul>
+    <li><a href="/age" data-k="만나이 나이 연나이 생일"><strong>만 나이</strong><small>만 나이, 연 나이, 다음 생일까지</small></a></li>
+    <li><a href="/dday" data-k="디데이 dday 날짜 기념일 며칠"><strong>D-day</strong><small>남은 날, 날짜 차이, 며칠째</small></a></li>
+  </ul>
+  <h2>생활</h2>
+  <ul>
+    <li><a href="/bmi" data-k="BMI 비만도 체질량 몸무게 키"><strong>BMI</strong><small>비만도와 내 키의 정상 체중 범위</small><span class="eg">170cm, 65kg이면 22.5</span></a></li>
+    <li><a href="/pyeong" data-k="평수 평 제곱미터 아파트 면적"><strong>평수</strong><small>평 ↔ ㎡</small><span class="eg">84㎡는 25.4평</span></a></li>
+    <li><a href="/unit" data-k="단위 변환 길이 무게 온도 인치 파운드 근 돈 자 화씨"><strong>단위 변환</strong><small>길이·무게·온도, 근·돈·자 포함</small><span class="eg">1자는 30.3cm</span></a></li>
+    <li><a href="/percent" data-k="퍼센트 비율 증감률 증가율"><strong>퍼센트</strong><small>A의 B%, 비율, 증감률</small><span class="eg">200의 15%는 30</span></a></li>
+    <li><a href="/char-count" data-k="글자수 자소서 바이트 공백"><strong>글자수 세기</strong><small>공백 포함·제외, 바이트, 줄 수</small></a></li>
+  </ul>
+  <p class="empty" id="empty" hidden>맞는 계산기가 없어요. <a href="/contact">만들어 달라고 요청하기</a></p>
+</div>
+<script>
+  const q = document.getElementById('q'), toc = document.getElementById('toc');
+  q.addEventListener('input', () => {
+    const term = q.value.trim().toLowerCase();
+    let shown = 0;
+    for (const ul of toc.querySelectorAll('ul')) {
+      let any = false;
+      for (const li of ul.children) {
+        const a = li.firstElementChild;
+        const hit = !term || (a.textContent + ' ' + a.dataset.k).toLowerCase().includes(term);
+        li.hidden = !hit; any ||= hit; shown += hit;
+      }
+      ul.hidden = ul.previousElementSibling.hidden = !any;
+    }
+    document.getElementById('empty').hidden = shown > 0;
+  });
+</script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>
 </html>

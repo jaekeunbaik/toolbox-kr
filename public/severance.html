@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>퇴직금 계산기: 평균임금으로 예상 퇴직금 | toolbox-kr</title>
+<meta name="description" content="입사일, 퇴직일, 최근 3개월 급여를 넣으면 1일 평균임금과 예상 퇴직금을 계산합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
+<h1>퇴직금 계산기</h1>
+<p class="lede">퇴직 전 3개월 동안 받은 급여로 평균임금을 구해 예상 퇴직금을 계산합니다.</p>
+<form id="f" class="inputs">
+  <label>입사일<input type="date" name="join" value="2023-11-21" required></label>
+  <label>퇴직일 (마지막 근무일 다음 날)<input type="date" name="leave" required></label>
+  <label class="wide">퇴직 전 3개월 급여 총액 (세전, 원)<input type="number" name="pay3m" data-won value="9000000" min="0" step="any" inputmode="numeric" required></label>
+  <label>1년간 상여금 총액 (원)<input type="number" name="bonus" data-won value="0" min="0" step="any" inputmode="numeric"></label>
+  <label>1년간 연차수당 (원)<input type="number" name="leavepay" data-won value="0" min="0" step="any" inputmode="numeric"></label>
+</form>
+<section class="answer" aria-live="polite">
+  <p class="answer-label">예상 퇴직금 (세전)</p>
+  <p class="answer-value"><mark id="amount">-</mark></p>
+  <dl class="detail">
+    <dt>재직일수</dt><dd id="days">-</dd>
+    <dt>1일 평균임금</dt><dd id="avg">-</dd>
+    <dt>평균임금 기간</dt><dd id="d3">-</dd>
+  </dl>
+</section>
+<section class="notes">
+  <h2>계산 기준</h2>
+  <ul>
+    <li>퇴직금은 1일 평균임금 × 30일 × (재직일수 ÷ 365)입니다.</li>
+    <li>1년 이상 일했고 주 15시간 이상 근무했다면 받을 수 있어요.</li>
+    <li>상여금과 연차수당은 1년 치의 3/12만큼 평균임금에 더합니다.</li>
+    <li>퇴직소득세를 빼기 전 금액이에요. 정확한 금액은 회사나 고용노동부에서 확인하세요.</li>
+  </ul>
+</section>
+<script type="module">
+  import { severance, won, parseDate, todayParts } from '/js/calc.js';
+  const f = document.getElementById('f'), $ = id => document.getElementById(id);
+  const t = todayParts();
+  f.leave.value = `${t.y}-${String(t.m).padStart(2, '0')}-${String(t.d).padStart(2, '0')}`;
+  const show = () => {
+    if (!f.join.value || !f.leave.value) return;
+    const x = severance({ join: parseDate(f.join.value), leave: parseDate(f.leave.value), pay3m: +f.pay3m.value, annualBonus: +f.bonus.value, leavePay: +f.leavepay.value });
+    if (x.workDays <= 0) { $('amount').textContent = '퇴직일이 입사일보다 늦어야 해요'; return; }
+    $('amount').textContent = x.eligible ? won(x.amount) : '1년 미만 근무는 퇴직금 대상이 아니에요';
+    $('days').textContent = `${x.workDays.toLocaleString()}일`;
+    $('avg').textContent = won(x.dailyAvg);
+    $('d3').textContent = `${x.days3m}일`;
+  };
+  f.addEventListener('input', show);
+  show();
+</script>
+<script type="module" src="/js/won-hint.js"></script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
+</body>
+</html>

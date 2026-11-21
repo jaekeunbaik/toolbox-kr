@@ -5,38 +5,58 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>만 나이 계산기 | toolbox-kr</title>
 <meta name="description" content="생년월일을 넣으면 오늘 기준 만 나이와 연 나이, 다음 생일까지 남은 날을 알려드립니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
 <h1>만 나이 계산기</h1>
-<label>생년월일 <input type="date" id="birth" value="2000-01-01"></label>
-<label>기준일 <input type="date" id="base"></label>
-<dl aria-live="polite">
-  <dt>만 나이</dt><dd id="age">-</dd>
-  <dt>연 나이</dt><dd id="yage">-</dd>
-  <dt>다음 생일까지</dt><dd id="next">-</dd>
-</dl>
-<p class="help">2023년 6월부터 법적·사회적 나이는 만 나이로 통일되었습니다. 연 나이(현재 연도 − 출생 연도)는 병역·청소년보호법 등 일부 법률에서 씁니다.</p>
+<p class="lede">생년월일을 넣으면 오늘 기준 만 나이를 알려줍니다.</p>
+<div class="inputs">
+  <label>생년월일<input type="date" id="birth" value="2000-01-01"></label>
+  <label>기준일<input type="date" id="base"></label>
+</div>
+<section class="answer" aria-live="polite">
+  <p class="answer-label">만 나이</p>
+  <p class="answer-value"><mark id="age">-</mark></p>
+  <dl class="detail">
+    <dt>연 나이</dt><dd id="yage">-</dd>
+    <dt>다음 생일까지</dt><dd id="next">-</dd>
+  </dl>
+</section>
+<section class="notes">
+  <h2>알아두면 좋은 점</h2>
+  <ul>
+    <li>2023년 6월부터 법적·사회적 나이는 만 나이로 통일됐어요.</li>
+    <li>연 나이(올해 − 태어난 해)는 병역, 청소년보호법 등 일부 법에서 아직 씁니다.</li>
+    <li>2월 29일생은 평년에는 3월 1일에 나이가 바뀝니다.</li>
+  </ul>
+</section>
 <script type="module">
   import { koreanAge, daysBetween, parseDate, todayParts } from '/js/calc.js';
   const $ = id => document.getElementById(id);
   const t = todayParts();
   $('base').value = `${t.y}-${String(t.m).padStart(2, '0')}-${String(t.d).padStart(2, '0')}`;
+  const parts = d => ({ y: d.getUTCFullYear(), m: d.getUTCMonth() + 1, d: d.getUTCDate() });
   const show = () => {
     if (!$('birth').value || !$('base').value) return;
     const b = parseDate($('birth').value), now = parseDate($('base').value);
     const age = koreanAge(b, now);
-    $('age').textContent = age >= 0 ? `${age}세` : '-';
+    $('age').textContent = age >= 0 ? `${age}세` : '기준일이 생년월일보다 늦어야 해요';
     $('yage').textContent = `${now.y - b.y}세`;
     // next birthday: this year's, or next year's if already passed; Feb 29 falls back to Mar 1
     let y = now.y, nb;
-    do { nb = new Date(Date.UTC(y++, b.m - 1, b.d)); } while (daysBetween(now, { y: nb.getUTCFullYear(), m: nb.getUTCMonth() + 1, d: nb.getUTCDate() }) < 0);
-    const left = daysBetween(now, { y: nb.getUTCFullYear(), m: nb.getUTCMonth() + 1, d: nb.getUTCDate() });
-    $('next').textContent = left === 0 ? '오늘이 생일이에요 🎉' : `${left}일`;
+    do { nb = parts(new Date(Date.UTC(y++, b.m - 1, b.d))); } while (daysBetween(now, nb) < 0);
+    const left = daysBetween(now, nb);
+    $('next').textContent = left === 0 ? '오늘이 생일이에요' : `${left}일`;
   };
   document.addEventListener('input', show);
   show();
 </script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>
 </html>

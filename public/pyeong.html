@@ -3,26 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>평수 계산기 - 평 ↔ ㎡ 변환 | toolbox-kr</title>
+<title>평수 계산기: 평 ↔ ㎡ 변환 | toolbox-kr</title>
 <meta name="description" content="평을 제곱미터(㎡)로, ㎡를 평으로 바로 바꿔 드립니다. 아파트 59㎡, 84㎡가 몇 평인지 확인하세요.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
 <h1>평수 계산기</h1>
-<label>평 <input type="number" id="py" step="any" min="0" value="25"></label>
-<label>제곱미터 (㎡) <input type="number" id="m2" step="any" min="0"></label>
-<h2>자주 찾는 크기</h2>
-<ul id="common"></ul>
-<p class="help">1평 = 400/121 ㎡ ≈ 3.3058㎡. 아파트 분양 면적의 "84㎡"는 보통 전용면적이며, 공급면적(평형)은 이보다 큽니다.</p>
+<p class="lede">어느 칸이든 입력하면 다른 칸이 바뀝니다.</p>
+<div class="inputs">
+  <label>평<input type="number" id="py" step="any" min="0" value="25" inputmode="decimal"></label>
+  <label>제곱미터 (㎡)<input type="number" id="m2" step="any" min="0" inputmode="decimal"></label>
+</div>
+<section class="answer" aria-live="polite">
+  <p class="answer-label">결과</p>
+  <p class="answer-value"><mark id="res">-</mark></p>
+  <h2>아파트 전용면적별 평수</h2>
+  <dl class="detail" id="common"></dl>
+</section>
+<section class="notes">
+  <h2>알아두면 좋은 점</h2>
+  <ul>
+    <li>1평은 400/121㎡, 약 3.3058㎡입니다.</li>
+    <li>분양 광고의 "84㎡"는 보통 전용면적이에요. 흔히 말하는 "34평"은 공용 공간까지 더한 공급면적입니다.</li>
+  </ul>
+</section>
 <script type="module">
   import { pyeongToM2, m2ToPyeong, num } from '/js/calc.js';
-  const py = document.getElementById('py'), m2 = document.getElementById('m2');
-  py.addEventListener('input', () => { m2.value = py.value === '' ? '' : num(pyeongToM2(+py.value)).replace(/,/g, ''); });
-  m2.addEventListener('input', () => { py.value = m2.value === '' ? '' : num(m2ToPyeong(+m2.value)).replace(/,/g, ''); });
+  const py = document.getElementById('py'), m2 = document.getElementById('m2'), res = document.getElementById('res');
+  const plain = n => String(+n.toFixed(2));
+  const show = () => res.textContent = py.value === '' ? '-' : `${num(+py.value)}평 = ${num(+m2.value)}㎡`;
+  py.addEventListener('input', () => { m2.value = py.value === '' ? '' : plain(pyeongToM2(+py.value)); show(); });
+  m2.addEventListener('input', () => { py.value = m2.value === '' ? '' : plain(m2ToPyeong(+m2.value)); show(); });
   py.dispatchEvent(new Event('input'));
   document.getElementById('common').innerHTML = [39, 49, 59, 74, 84, 101, 114]
-    .map(m => `<li>${m}㎡ ≈ ${num(m2ToPyeong(m), 1)}평</li>`).join('');
+    .map(m => `<dt>${m}㎡</dt><dd>${num(m2ToPyeong(m), 1)}평</dd>`).join('');
 </script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>
 </html>

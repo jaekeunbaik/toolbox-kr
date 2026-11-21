@@ -3,39 +3,55 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>대출 이자 계산기 - 원리금균등·원금균등·만기일시 | toolbox-kr</title>
+<title>대출 이자 계산기: 원리금균등·원금균등·만기일시 | toolbox-kr</title>
 <meta name="description" content="대출금, 금리, 기간을 넣으면 월 상환액과 총 이자를 원리금균등·원금균등·만기일시 방식별로 계산합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
 <h1>대출 이자 계산기</h1>
+<p class="lede">대출금, 금리, 기간을 넣으면 매달 낼 돈과 총 이자를 보여줍니다.</p>
 <form id="f">
-  <label>대출금 (원) <input type="number" name="p" value="100000000" min="1" step="any" required></label>
-  <label>연 금리 (%) <input type="number" name="r" value="4.5" min="0" step="any" required></label>
-  <label>기간 (개월) <input type="number" name="n" value="360" min="1" step="1" required></label>
-  <label>상환 방식
-    <select name="type">
-      <option value="equal-payment">원리금균등 (매달 같은 금액)</option>
-      <option value="equal-principal">원금균등 (갈수록 줄어듦)</option>
-      <option value="bullet">만기일시 (이자만 내다가 마지막에 원금)</option>
-    </select>
-  </label>
+  <fieldset class="choice">
+    <legend>상환 방식</legend>
+    <label><input type="radio" name="type" value="equal-payment" checked><span>원리금균등</span></label>
+    <label><input type="radio" name="type" value="equal-principal"><span>원금균등</span></label>
+    <label><input type="radio" name="type" value="bullet"><span>만기일시</span></label>
+  </fieldset>
+  <div class="inputs">
+    <label>대출금 (원)<input type="number" name="p" value="100000000" data-won min="1" step="any" inputmode="numeric" required></label>
+    <label>연 금리 (%)<input type="number" name="r" value="4.5" min="0" step="any" inputmode="decimal" required></label>
+    <label>기간 (개월)<input type="number" name="n" value="360" min="1" step="1" inputmode="numeric" required></label>
+  </div>
 </form>
-<dl aria-live="polite">
-  <dt id="mlabel">월 상환액</dt><dd id="monthly">-</dd>
-  <dt>총 이자</dt><dd id="interest">-</dd>
-  <dt>총 상환액</dt><dd id="total">-</dd>
-</dl>
-<p class="help">원금균등은 첫 달 상환액이 가장 크고 매달 줄어듭니다. 만기일시는 마지막 달에 원금을 한 번에 갚습니다. 실제 대출은 중도상환수수료·우대금리 등에 따라 달라질 수 있습니다.</p>
+<section class="answer" aria-live="polite">
+  <p class="answer-label" id="mlabel">월 상환액</p>
+  <p class="answer-value"><mark id="monthly">-</mark></p>
+  <dl class="detail">
+    <dt>총 이자</dt><dd id="interest">-</dd>
+    <dt>총 상환액</dt><dd id="total">-</dd>
+  </dl>
+</section>
+<section class="notes">
+  <h2>상환 방식 차이</h2>
+  <ul>
+    <li>원리금균등: 매달 같은 금액을 냅니다. 주택담보대출에서 가장 흔해요.</li>
+    <li>원금균등: 첫 달이 가장 많고 매달 줄어듭니다. 총 이자는 원리금균등보다 적어요.</li>
+    <li>만기일시: 매달 이자만 내고 마지막 달에 원금을 한 번에 갚습니다. 총 이자가 가장 많아요.</li>
+  </ul>
+</section>
 <script type="module">
   import { loan, won } from '/js/calc.js';
   const f = document.getElementById('f');
   const show = () => {
-    const p = +f.p.value, r = +f.r.value, n = +f.n.value;
+    const p = +f.p.value, r = +f.r.value, n = +f.n.value, type = f.type.value;
     if (!(p > 0 && r >= 0 && n >= 1)) return;
-    const x = loan(p, r, n, f.type.value);
-    document.getElementById('mlabel').textContent = f.type.value === 'equal-principal' ? '첫 달 상환액' : '월 상환액';
+    const x = loan(p, r, n, type);
+    document.getElementById('mlabel').textContent = type === 'equal-principal' ? '첫 달 상환액' : type === 'bullet' ? '월 이자 (마지막 달엔 원금 추가)' : '월 상환액';
     document.getElementById('monthly').textContent = won(x.monthly);
     document.getElementById('interest').textContent = won(x.totalInterest);
     document.getElementById('total').textContent = won(p + x.totalInterest);
@@ -43,5 +59,8 @@
   f.addEventListener('input', show);
   show();
 </script>
+<script type="module" src="/js/won-hint.js"></script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>
 </html>
