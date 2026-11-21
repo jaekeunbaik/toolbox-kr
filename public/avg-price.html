@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>물타기 계산기: 주식 평단가 계산 | toolbox-kr</title>
+<meta name="description" content="지금 평단가와 수량, 추가로 살 가격과 수량을 넣으면 새 평단가와 수익률 변화를 계산합니다.">
+<link rel="canonical" href="https://toolbox-kr.ethan-kr.workers.dev/avg-price">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:site_name" content="toolbox-kr">
+<meta property="og:title" content="물타기 계산기: 주식 평단가 계산 | toolbox-kr">
+<meta property="og:description" content="지금 평단가와 수량, 추가로 살 가격과 수량을 넣으면 새 평단가와 수익률 변화를 계산합니다.">
+<meta property="og:url" content="https://toolbox-kr.ethan-kr.workers.dev/avg-price">
+<meta name="theme-color" content="#EEF1EC">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
+<h1>물타기 계산기</h1>
+<p class="lede">추가로 사면 평단가가 얼마가 되는지, 지금 가격 기준 수익률이 어떻게 바뀌는지 계산합니다.</p>
+<form id="f" class="inputs">
+  <label>지금 평단가 (원)<input type="number" name="hp" value="72000" data-won min="0" step="any" inputmode="numeric" required></label>
+  <label>보유 수량 (주)<input type="number" name="hq" value="30" min="0" step="any" inputmode="decimal" required></label>
+  <label>추가로 살 가격 (원)<input type="number" name="bp" value="58000" data-won min="0" step="any" inputmode="numeric" required></label>
+  <label>추가로 살 수량 (주)<input type="number" name="bq" value="20" min="0" step="any" inputmode="decimal" required></label>
+</form>
+<section class="answer" aria-live="polite">
+  <p class="answer-label">새 평단가</p>
+  <p class="answer-value"><mark id="avg">-</mark></p>
+  <dl class="detail">
+    <dt>총 수량</dt><dd id="qty">-</dd>
+    <dt>총 매수 금액</dt><dd id="cost">-</dd>
+    <dt>추가 매수에 드는 돈</dt><dd id="extra">-</dd>
+    <dt>지금 가격 기준 수익률</dt><dd id="pl">-</dd>
+  </dl>
+</section>
+<section class="notes">
+  <h2>알아두면 좋은 점</h2>
+  <ul>
+    <li>‘지금 가격’은 추가로 살 가격으로 봤어요. 수수료와 세금은 빠져 있습니다.</li>
+    <li>평단가가 내려가도 손실 금액이 줄어드는 건 아니에요. 가격이 평단가 위로 올라와야 수익이 납니다.</li>
+  </ul>
+</section>
+<script type="module">
+  import { avgPrice, won, num } from '/js/calc.js';
+  const f = document.getElementById('f'), $ = id => document.getElementById(id);
+  const pct = x => `${x > 0 ? '+' : ''}${num(x, 1)}%`;
+  const show = () => {
+    const hp = +f.hp.value, hq = +f.hq.value, bp = +f.bp.value, bq = +f.bq.value;
+    if (!(hp >= 0 && hq >= 0 && bp >= 0 && bq >= 0 && hq + bq > 0)) return;
+    const x = avgPrice(hp, hq, bp, bq);
+    $('avg').textContent = won(x.avg);
+    $('qty').textContent = `${num(x.qty)}주`;
+    $('cost').textContent = won(x.cost);
+    $('extra').textContent = won(bp * bq);
+    $('pl').textContent = hp > 0 && x.avg > 0 ? `${pct((bp / hp - 1) * 100)} → ${pct((bp / x.avg - 1) * 100)}` : '-';
+  };
+  f.addEventListener('input', show);
+  show();
+</script>
+<script type="module" src="/js/won-hint.js"></script>
+<script type="module" src="/js/share.js"></script>
+<nav class="related" aria-label="관련 계산기"><h2>함께 쓰는 계산기</h2><ul><li><a href="/percent">퍼센트</a></li><li><a href="/savings">예금·적금 이자</a></li><li><a href="/loan">대출 이자</a></li></ul></nav>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
+</body>
+</html>

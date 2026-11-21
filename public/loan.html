@@ -34,7 +34,7 @@
   <div class="inputs">
     <label>대출금 (원)<input type="number" name="p" value="100000000" data-won min="1" step="any" inputmode="numeric" required></label>
     <label>연 금리 (%)<input type="number" name="r" value="4.5" min="0" step="any" inputmode="decimal" required></label>
-    <label>기간 (개월)<input type="number" name="n" value="360" min="1" step="1" inputmode="numeric" required></label>
+    <label>기간<span class="unit"><input type="number" name="term" value="30" min="1" step="1" inputmode="numeric" required><select name="tu" aria-label="기간 단위"><option value="12">년</option><option value="1">개월</option></select></span></label>
   </div>
 </form>
 <section class="answer" aria-live="polite">
@@ -67,13 +67,13 @@
   const fillRows = () => {
     if (!schedule.open) return; // building 360 rows only when someone opens the table
     const f = document.getElementById('f');
-    document.getElementById('rows').innerHTML = loanSchedule(+f.p.value, +f.r.value, +f.n.value, f.type.value)
+    document.getElementById('rows').innerHTML = loanSchedule(+f.p.value, +f.r.value, f.term.value * f.tu.value, f.type.value)
       .map(r => `<tr><td>${r.n}</td><td>${n0(r.payment)}</td><td>${n0(r.principal)}</td><td>${n0(r.interest)}</td><td>${n0(r.balance)}</td></tr>`).join('');
   };
   schedule.addEventListener('toggle', fillRows);
   const f = document.getElementById('f');
   const show = () => {
-    const p = +f.p.value, r = +f.r.value, n = +f.n.value, type = f.type.value;
+    const p = +f.p.value, r = +f.r.value, n = f.term.value * f.tu.value, type = f.type.value;
     if (!(p > 0 && r >= 0 && n >= 1)) return;
     const x = loan(p, r, n, type);
     document.getElementById('mlabel').textContent = type === 'equal-principal' ? '첫 달 상환액' : type === 'bullet' ? '월 이자 (마지막 달엔 원금 추가)' : '월 상환액';
@@ -87,7 +87,7 @@
 </script>
 <script type="module" src="/js/won-hint.js"></script>
 <script type="module" src="/js/share.js"></script>
-<nav class="related" aria-label="관련 계산기"><h2>함께 쓰는 계산기</h2><ul><li><a href="/savings">예금·적금 이자</a></li><li><a href="/percent">퍼센트</a></li><li><a href="/severance">퇴직금</a></li></ul></nav>
+<nav class="related" aria-label="관련 계산기"><h2>함께 쓰는 계산기</h2><ul><li><a href="/rent">전월세 전환</a></li><li><a href="/savings">예금·적금 이자</a></li><li><a href="/percent">퍼센트</a></li></ul></nav>
 </main>
 <footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>

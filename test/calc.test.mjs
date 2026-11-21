@@ -86,3 +86,19 @@ assert.deepEqual(c.addDays(d('2024-02-28'), 1), d('2024-02-29'));
 assert.deepEqual(c.addDays(d('2026-01-01'), -1), d('2025-12-31'));
 assert.equal(c.weekday(d('2026-11-21')), '토');
 console.log('schedule/date tests passed');
+
+// 연차 (근로기준법 60조): 1년 미만 매달 1일(최대 11), 1년 15일, 이후 2년마다 +1일, 최대 25일
+assert.deepEqual(c.annualLeave(d('2026-01-01'), d('2026-03-31')), { years: 0, months: 2, days: 2 });
+assert.equal(c.annualLeave(d('2025-01-01'), d('2025-12-31')).days, 11);
+assert.equal(c.annualLeave(d('2025-01-01'), d('2026-01-01')).days, 15);
+assert.equal(c.annualLeave(d('2023-01-01'), d('2026-01-01')).days, 16);
+assert.equal(c.annualLeave(d('2021-01-01'), d('2026-01-01')).days, 17);
+assert.equal(c.annualLeave(d('1990-01-01'), d('2026-01-01')).days, 25);
+assert.equal(c.annualLeave(d('2026-02-01'), d('2026-01-01')).days, 0);
+
+// 물타기: 10만 원 10주 + 8만 원 10주 = 평단 9만 원
+assert.deepEqual(c.avgPrice(100000, 10, 80000, 10), { qty: 20, cost: 1800000, avg: 90000 });
+
+// 전월세 전환: 보증금 1억을 월세로, 전환율 6% -> 월 50만 원
+assert.equal(c.depositToRent(1e8, 6), 500000);
+console.log('leave/avg/rent tests passed');

@@ -126,3 +126,20 @@ export function addDays(p, days) {
   return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() };
 }
 export const weekday = p => '일월화수목금토'[new Date(Date.UTC(p.y, p.m - 1, p.d)).getUTCDay()];
+
+// 연차 days the worker is owed at date `on` (근로기준법 60조, assumes 80%+ attendance).
+// shortcut: whole months compare day-of-month only (1/31 -> 2/28 counts as 0 months), fine unless someone joins on the 29th-31st.
+export function annualLeave(join, on) {
+  const months = Math.max(0, (on.y - join.y) * 12 + on.m - join.m - (on.d < join.d ? 1 : 0));
+  const years = Math.floor(months / 12);
+  return { years, months: months % 12, days: years < 1 ? Math.min(11, months) : Math.min(25, 15 + Math.floor((years - 1) / 2)) };
+}
+
+// 물타기: average price after buying more.
+export function avgPrice(holdPrice, holdQty, buyPrice, buyQty) {
+  const qty = holdQty + buyQty, cost = holdPrice * holdQty + buyPrice * buyQty;
+  return { qty, cost, avg: cost / qty };
+}
+
+// 전월세 전환: monthly rent for a deposit amount at a yearly conversion rate (%).
+export const depositToRent = (deposit, ratePct) => (deposit * ratePct) / 100 / 12;
