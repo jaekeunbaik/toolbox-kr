@@ -41,3 +41,64 @@ export const parseDate = s => { const [y, m, d] = s.split('-').map(Number); retu
 export const todayParts = () => { const t = new Date(); return { y: t.getFullYear(), m: t.getMonth() + 1, d: t.getDate() }; };
 export const won = n => Math.round(n).toLocaleString('ko-KR') + '원';
 export const num = (n, digits = 2) => Number(n.toFixed(digits)).toLocaleString('ko-KR');
+
+// 주휴수당: weekly hours >= 15 earn paid rest = min(h,40)/40 * 8 hours. Month = 365/7/12 weeks.
+export const MIN_WAGE_2026 = 10320;
+export const WEEKS_PER_MONTH = 365 / 7 / 12;
+export function weeklyPay(hourly, weeklyHours) {
+  const restHours = weeklyHours >= 15 ? (Math.min(weeklyHours, 40) / 40) * 8 : 0;
+  const weekly = (weeklyHours + restHours) * hourly;
+  // 고용노동부 기준: 월 소정근로시간 = (주 근무 + 주휴) x 4.345, rounded (40h -> 209h)
+  const monthlyHours = Math.round((weeklyHours + restHours) * WEEKS_PER_MONTH);
+  return { restHours, restPay: restHours * hourly, weekly, monthlyHours, monthly: monthlyHours * hourly };
+}
+
+// 퇴직금 (estimate). `leave` = day after the last working day, as the 고용노동부 calculator uses.
+export function severance({ join, leave, pay3m, annualBonus = 0, leavePay = 0 }) {
+  const workDays = daysBetween(join, leave);
+  // shortcut: day 29-31 with no match 3 months back rolls into the next month (Date.UTC), a 1-3 day error in the 3-month base
+  const from = { y: leave.m <= 3 ? leave.y - 1 : leave.y, m: ((leave.m + 8) % 12) + 1, d: leave.d };
+  const days3m = daysBetween(from, leave);
+  const dailyAvg = (pay3m + (annualBonus * 3) / 12 + (leavePay * 3) / 12) / days3m;
+  return { workDays, days3m, dailyAvg, eligible: workDays >= 365, amount: workDays >= 365 ? dailyAvg * 30 * (workDays / 365) : 0 };
+}
+
+// 부가세 10%. From supply price, or back out of a VAT-included total.
+export const vatFromSupply = supply => { const vat = Math.round(supply * 0.1); return { supply, vat, total: supply + vat }; };
+export const vatFromTotal = total => { const supply = Math.round(total / 1.1); return { supply, vat: total - supply, total }; };
+
+// 예금 (lump sum) / 적금 (monthly deposit), simple interest unless compound. taxPct: 15.4 normal, 9.5 우대, 0 비과세.
+export function savings({ kind, amount, ratePct, months, taxPct = 15.4, compound = false }) {
+  const r = ratePct / 100 / 12;
+  const principal = kind === 'deposit' ? amount : amount * months;
+  const interest = kind === 'deposit'
+    ? (compound ? amount * ((1 + r) ** months - 1) : amount * r * months)
+    : amount * r * (months * (months + 1)) / 2; // each deposit earns for its remaining months
+  const tax = Math.floor((interest * taxPct) / 100 / 10) * 10; // 원 단위 절사 (10원 미만)
+  return { principal, interest, tax, net: principal + interest - tax };
+}
+
+export const discounted = (price, pct) => price * (1 - pct / 100);
+export const discountRate = (price, sale) => (1 - sale / price) * 100;
+
+// Unit conversion through a base unit (m, g). Temperatures are handled separately.
+export const UNITS = {
+  length: { mm: 0.001, cm: 0.01, m: 1, km: 1000, 'in': 0.0254, ft: 0.3048, yd: 0.9144, mi: 1609.344, '자': 10 / 33 },
+  weight: { mg: 0.001, g: 1, kg: 1000, t: 1e6, oz: 28.349523125, lb: 453.59237, '돈': 3.75, '근': 600 },
+};
+export const convert = (kind, value, from, to) => (value * UNITS[kind][from]) / UNITS[kind][to];
+export const cToF = c => (c * 9) / 5 + 32;
+export const fToC = f => ((f - 32) * 5) / 9;
+
+// 100000000 -> "1억 원", 123456789 -> "1억 2,345만 6,789 원" (readable hint under money inputs)
+export function koreanWon(n) {
+  n = Math.floor(Math.abs(n));
+  if (!n) return '0원';
+  const parts = [];
+  for (const [unit, size] of [['조', 1e12], ['억', 1e8], ['만', 1e4]]) {
+    const q = Math.floor(n / size) % 1e4;
+    if (n >= size && q) parts.push(q.toLocaleString('ko-KR') + unit);
+  }
+  if (n % 1e4) parts.push((n % 1e4).toLocaleString('ko-KR'));
+  return parts.join(' ') + ' 원';
+}

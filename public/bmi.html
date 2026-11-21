@@ -3,34 +3,51 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>BMI 계산기 - 비만도 계산 | toolbox-kr</title>
-<meta name="description" content="키와 몸무게를 넣으면 BMI(체질량지수)와 저체중·정상·과체중·비만 구분을 바로 계산합니다.">
+<title>BMI 계산기: 비만도 계산 | toolbox-kr</title>
+<meta name="description" content="키와 몸무게를 넣으면 BMI(체질량지수)와 저체중·정상·과체중·비만 구분, 내 키의 정상 체중 범위를 계산합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
 <h1>BMI 계산기</h1>
-<form id="f">
-  <label>키 (cm) <input type="number" name="h" value="170" min="1" step="any" required></label>
-  <label>몸무게 (kg) <input type="number" name="w" value="65" min="1" step="any" required></label>
+<p class="lede">키와 몸무게로 체질량지수를 계산하고, 내 키에서 정상 체중 범위도 알려줍니다.</p>
+<form id="f" class="inputs">
+  <label>키 (cm)<input type="number" name="h" value="170" min="50" max="250" step="any" inputmode="decimal" required></label>
+  <label>몸무게 (kg)<input type="number" name="w" value="65" min="1" max="400" step="any" inputmode="decimal" required></label>
 </form>
-<dl aria-live="polite">
-  <dt>BMI</dt><dd id="bmi">-</dd>
-  <dt>구분</dt><dd id="cat">-</dd>
-</dl>
-<p class="help">구분 기준(대한비만학회): 18.5 미만 저체중, 18.5~22.9 정상, 23~24.9 과체중(비만 전단계), 25 이상 비만. BMI는 근육량·연령 등을 반영하지 못하므로 참고용으로만 사용하세요.</p>
+<section class="answer" aria-live="polite">
+  <p class="answer-label">BMI</p>
+  <p class="answer-value"><mark id="bmi">-</mark><span class="sub" id="cat"></span></p>
+  <dl class="detail">
+    <dt>정상 체중 범위</dt><dd id="range">-</dd>
+  </dl>
+</section>
+<section class="notes">
+  <h2>구분 기준 (대한비만학회)</h2>
+  <ul>
+    <li>18.5 미만은 저체중, 18.5~22.9는 정상, 23~24.9는 비만 전단계, 25 이상은 비만입니다.</li>
+    <li>BMI는 근육량이나 나이를 반영하지 못하니 참고용으로만 보세요.</li>
+  </ul>
+</section>
 <script type="module">
   import { bmi, bmiCategory, num } from '/js/calc.js';
   const f = document.getElementById('f');
   const show = () => {
     const h = +f.h.value, w = +f.w.value;
     if (!(h > 0 && w > 0)) return;
-    const v = bmi(h, w);
+    const v = bmi(h, w), m2 = (h / 100) ** 2;
     document.getElementById('bmi').textContent = num(v, 1);
     document.getElementById('cat').textContent = bmiCategory(v);
+    document.getElementById('range').textContent = `${num(18.5 * m2, 1)} ~ ${num(22.9 * m2, 1)}kg`;
   };
   f.addEventListener('input', show);
   show();
 </script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
 </body>
 </html>

@@ -47,8 +47,11 @@ jobs:
             Rules:
             - Only create or edit files inside public/. Never touch anything else.
             - No external scripts, trackers, redirects, or links to other sites.
-            - New tools: one HTML page per tool (copy the structure of public/loan.html: /style.css, the nav bar,
-              calculation logic in public/js/calc.js), linked from public/index.html and listed in public/sitemap.xml.
+            - New tools: one HTML page per tool. Copy public/loan.html exactly (head, header, footer, .inputs,
+              .answer with one <mark> for the main result, .detail, .notes). Put calculation logic in public/js/calc.js.
+              Money inputs get data-won plus the /js/won-hint.js script. Add the tool to the right group in
+              public/index.html and to public/sitemap.xml.
+            - Keep the existing design: no new colors, fonts, cards, shadows, gradients or animations.
             - If the inquiry is spam, abusive, or not a reasonable site change, change nothing.
             - Do not commit; just edit files.
 

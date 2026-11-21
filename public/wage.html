@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>주휴수당 계산기: 시급으로 주급·월급 환산 | toolbox-kr</title>
+<meta name="description" content="시급과 주 근무시간을 넣으면 주휴수당과 주급, 월 환산 급여를 계산합니다. 2026년 최저시급 10,320원 기준.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
+<h1>시급·주휴수당 계산기</h1>
+<p class="lede">일주일에 15시간 이상 일하면 주휴수당을 받을 수 있어요. 포함한 급여를 계산합니다.</p>
+<form id="f" class="inputs">
+  <label>시급 (원)<input type="number" name="hourly" value="10320" data-won min="0" step="any" inputmode="numeric" required></label>
+  <label>주 근무시간<input type="number" name="hours" value="40" min="0" max="168" step="any" inputmode="decimal" required></label>
+</form>
+<section class="answer" aria-live="polite">
+  <p class="answer-label">월 환산 급여 (주휴수당 포함)</p>
+  <p class="answer-value"><mark id="monthly">-</mark></p>
+  <dl class="detail">
+    <dt>주휴시간</dt><dd id="rest">-</dd>
+    <dt>주휴수당 (1주)</dt><dd id="restpay">-</dd>
+    <dt>주급</dt><dd id="weekly">-</dd>
+    <dt>월 환산 시간</dt><dd id="mhours">-</dd>
+  </dl>
+  <p class="error" id="minwarn" hidden>2026년 최저시급 10,320원보다 낮아요.</p>
+</section>
+<section class="notes">
+  <h2>계산 기준</h2>
+  <ul>
+    <li>주휴시간은 (주 근무시간 ÷ 40) × 8시간이고, 최대 8시간입니다.</li>
+    <li>월 환산 시간은 (주 근무 + 주휴) × 4.345주를 반올림했어요. 주 40시간이면 209시간입니다.</li>
+    <li>세금과 4대보험을 빼기 전 금액이에요. 연장·야간 수당은 포함하지 않았어요.</li>
+  </ul>
+</section>
+<script type="module">
+  import { weeklyPay, won, MIN_WAGE_2026 } from '/js/calc.js';
+  const f = document.getElementById('f'), $ = id => document.getElementById(id);
+  const show = () => {
+    const hourly = +f.hourly.value, hours = +f.hours.value;
+    if (!(hourly >= 0 && hours >= 0)) return;
+    const x = weeklyPay(hourly, hours);
+    $('monthly').textContent = won(x.monthly);
+    $('rest').textContent = x.restHours ? `${+x.restHours.toFixed(2)}시간` : '없음 (주 15시간 미만)';
+    $('restpay').textContent = won(x.restPay);
+    $('weekly').textContent = won(x.weekly);
+    $('mhours').textContent = `${x.monthlyHours}시간`;
+    $('minwarn').hidden = !(hourly > 0 && hourly < MIN_WAGE_2026);
+  };
+  f.addEventListener('input', show);
+  show();
+</script>
+<script type="module" src="/js/won-hint.js"></script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
+</body>
+</html>

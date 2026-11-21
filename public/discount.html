@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>할인율 계산기: 할인가, 몇 % 할인 | toolbox-kr</title>
+<meta name="description" content="정가와 할인율로 할인가를, 정가와 판매가로 몇 % 할인인지 계산합니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site"><a class="home" href="/">toolbox-kr</a><a href="/contact">문의하기</a></header>
+<main>
+<h1>할인율 계산기</h1>
+<p class="lede">빈칸에 숫자를 넣으면 문장 속 답이 바로 바뀝니다.</p>
+<p class="sentence">
+  <input type="number" id="p1" value="50000" min="0" step="any" inputmode="numeric" aria-label="정가">원에서
+  <input type="number" id="r1" value="20" min="0" max="100" step="any" inputmode="decimal" aria-label="할인율">% 할인하면
+  <output id="o1" aria-live="polite"><mark>-</mark></output>
+</p>
+<p class="sentence">
+  <input type="number" id="p2" value="50000" min="0" step="any" inputmode="numeric" aria-label="정가">원짜리를
+  <input type="number" id="s2" value="39000" min="0" step="any" inputmode="numeric" aria-label="판매가">원에 사면
+  <output id="o2" aria-live="polite"><mark>-</mark></output>
+</p>
+<section class="notes">
+  <h2>알아두면 좋은 점</h2>
+  <ul>
+    <li>20% 할인에 추가 10% 할인은 30% 할인이 아니라 28% 할인이에요. 할인가에서 다시 10%를 빼기 때문입니다.</li>
+  </ul>
+</section>
+<script type="module">
+  import { discounted, discountRate, won, num } from '/js/calc.js';
+  const v = id => +document.getElementById(id).value;
+  const say = (id, text) => document.getElementById(id).firstElementChild.textContent = text;
+  const show = () => {
+    const sale = discounted(v('p1'), v('r1'));
+    say('o1', Number.isFinite(sale) ? `${won(sale)} (${won(v('p1') - sale)} 할인)` : '-');
+    const rate = discountRate(v('p2'), v('s2'));
+    say('o2', Number.isFinite(rate) ? (rate >= 0 ? `${num(rate, 1)}% 할인` : `${num(-rate, 1)}% 비싸게 산 거예요`) : '-');
+  };
+  document.addEventListener('input', show);
+  show();
+</script>
+</main>
+<footer><p>계산 결과는 참고용이며 실제 금액은 기관·계약 조건에 따라 다를 수 있어요. 필요한 계산기가 있으면 <a href="/contact">알려주세요</a>.</p></footer>
+</body>
+</html>
