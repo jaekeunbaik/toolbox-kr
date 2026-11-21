@@ -24,9 +24,7 @@
     all: [...s].length,                      // [...s] counts emoji as 1, not 2
     nospace: [...s.replace(/\s/g, '')].length,
     bytes: new TextEncoder().encode(s).length,
-    lines: s === '' ? 0 : s.split(/
-||
-/).length,
+    lines: s === '' ? 0 : s.split(/\r\n|\r|\n/).length,
   });
   t.addEventListener('input', () => {
     const c = count(t.value);
