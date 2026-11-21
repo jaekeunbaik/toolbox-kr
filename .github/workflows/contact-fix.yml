@@ -47,7 +47,8 @@ jobs:
             Rules:
             - Only create or edit files inside public/. Never touch anything else.
             - No external scripts, trackers, redirects, or links to other sites.
-            - New tools: one self-contained HTML page per tool, linked from public/index.html.
+            - New tools: one HTML page per tool (copy the structure of public/loan.html: /style.css, the nav bar,
+              calculation logic in public/js/calc.js), linked from public/index.html and listed in public/sitemap.xml.
             - If the inquiry is spam, abusive, or not a reasonable site change, change nothing.
             - Do not commit; just edit files.
 
