@@ -77,14 +77,5 @@ jobs:
           git switch -c "$branch"
           git commit -q -m "$TITLE (#$ISSUE)"
           git push -q origin "$branch"
-          stat=$(git diff --stat HEAD~1 | tail -20)
           url=$(gh pr create --head "$branch" --title "$TITLE" --body "Closes #$ISSUE")
-          pr=${url##*/}
-          [ -z "$DISCORD_BOT_TOKEN" ] && { echo "Discord not configured; PR only: $url"; exit 0; }
-          content=$(printf '🛠️ **새 수정 제안** #%s\n%s\n```\n%s\n```\n%s' "$pr" "$TITLE" "$stat" "$url" | head -c 1900)
-          jq -n --arg c "$content" --arg pr "$pr" '{content:$c, components:[{type:1, components:[
-              {type:2, style:3, label:"승인", custom_id:("approve:"+$pr)},
-              {type:2, style:4, label:"반려", custom_id:("reject:"+$pr)},
-              {type:2, style:5, label:"변경 보기", url:("https://github.com/'"$GITHUB_REPOSITORY"'/pull/"+$pr+"/files")}]}]}' |
-            curl -sf -X POST "https://discord.com/api/v10/channels/$DISCORD_CHANNEL_ID/messages" \
-              -H "Authorization: Bot $DISCORD_BOT_TOKEN" -H "Content-Type: application/json" -d @- > /dev/null
+          bash .github/notify-discord.sh "${url##*/}"

@@ -1,0 +1,25 @@
+# Manually resend the Discord approve/reject message for an existing PR (Actions tab -> notify -> Run workflow).
+name: notify
+on:
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: PR number
+        required: true
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ inputs.pr }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_CHANNEL_ID: ${{ secrets.DISCORD_CHANNEL_ID }}
+        run: |
+          [[ "$PR" =~ ^[0-9]+$ ]] || { echo "PR must be a number"; exit 1; }
+          bash .github/notify-discord.sh "$PR"
