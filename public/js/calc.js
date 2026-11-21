@@ -28,7 +28,11 @@ export function koreanAge(birth, today) {
 export const daysBetween = (from, to) =>
   Math.round((Date.UTC(to.y, to.m - 1, to.d) - Date.UTC(from.y, from.m - 1, from.d)) / 86400000);
 
-export const PYEONG_M2 = 400 / 121; // legal definition: 1평 = 400/121 ㎡
+// BMI from height (cm) and weight (kg); category per 대한비만학회 (아시아-태평양 기준).
+export const bmi = (heightCm, weightKg) => weightKg / (heightCm / 100) ** 2;
+export const bmiCategory = v => (v < 18.5 ? '저체중' : v < 23 ? '정상' : v < 25 ? '과체중' : '비만');
+
+export const PYEONG_M2= 400 / 121; // legal definition: 1평 = 400/121 ㎡
 export const pyeongToM2 = p => p * PYEONG_M2;
 export const m2ToPyeong = m => m / PYEONG_M2;
 

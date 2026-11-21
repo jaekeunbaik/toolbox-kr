@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BMI 계산기 - 비만도 계산 | toolbox-kr</title>
+<meta name="description" content="키와 몸무게를 넣으면 BMI(체질량지수)와 저체중·정상·과체중·비만 구분을 바로 계산합니다.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<nav><a href="/">← 전체 도구</a><a href="/contact">문의하기</a></nav>
+<h1>BMI 계산기</h1>
+<form id="f">
+  <label>키 (cm) <input type="number" name="h" value="170" min="1" step="any" required></label>
+  <label>몸무게 (kg) <input type="number" name="w" value="65" min="1" step="any" required></label>
+</form>
+<dl aria-live="polite">
+  <dt>BMI</dt><dd id="bmi">-</dd>
+  <dt>구분</dt><dd id="cat">-</dd>
+</dl>
+<p class="help">구분 기준(대한비만학회): 18.5 미만 저체중, 18.5~22.9 정상, 23~24.9 과체중(비만 전단계), 25 이상 비만. BMI는 근육량·연령 등을 반영하지 못하므로 참고용으로만 사용하세요.</p>
+<script type="module">
+  import { bmi, bmiCategory, num } from '/js/calc.js';
+  const f = document.getElementById('f');
+  const show = () => {
+    const h = +f.h.value, w = +f.w.value;
+    if (!(h > 0 && w > 0)) return;
+    const v = bmi(h, w);
+    document.getElementById('bmi').textContent = num(v, 1);
+    document.getElementById('cat').textContent = bmiCategory(v);
+  };
+  f.addEventListener('input', show);
+  show();
+</script>
+</body>
+</html>
